@@ -51,13 +51,11 @@ export default function Dashboard() {
     // Fonction pour appliquer les classes de couleur en fonction de la valeur du pourcentage
     const getPercentageClass = (percentage: number) => {
         if (percentage === 0) {
-            return "text-red-500"; // Rouge
+            return "text-red-600"; // Rouge
         } else if (percentage === 100) {
-            return "text-green-500"; // Vert
-        } else if (percentage < 50) {
-            return "text-orange-500"; // Orange
+            return "text-green-600"; // Vert
         } else {
-            return "text-yellow-500"; // Jaune
+            return "text-blue-500"; // bleu
         }
     };
 
