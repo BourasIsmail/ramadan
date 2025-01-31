@@ -67,7 +67,7 @@ export default function Dashboard() {
         <div className="space-y-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Détails</CardTitle>
+                    <CardTitle>Détails :</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -87,7 +87,7 @@ export default function Dashboard() {
                             <TableBody>
                                 {data.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell className="font-bold">{item.delegation_name}</TableCell>
+                                        <TableCell className="font-bold text-purple-900">{item.delegation_name}</TableCell>
                                         <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
                                             {item.pourcentage_global.toFixed(2)}%
                                         </TableCell>{productNames.map((product) => (
