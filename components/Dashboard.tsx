@@ -67,7 +67,7 @@ export default function Dashboard() {
         <div className="space-y-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Details</CardTitle>
+                    <CardTitle>Détails</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -75,16 +75,19 @@ export default function Dashboard() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Delegation</TableHead>
+                                    <TableHead>pourcentages totaux</TableHead>
                                     {productNames.map((product) => (
                                         <TableHead key={product}>{product}</TableHead>
                                     ))}
-                                    <TableHead>Pourcentages Totals</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {data.map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{item.delegation_name}</TableCell>
+                                        <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
+                                            {item.pourcentage_global.toFixed(2)}%
+                                        </TableCell>
                                         {productNames.map((product) => (
                                             <TableCell key={product}>
                                                 {typeof item[product] === "number"
@@ -92,9 +95,6 @@ export default function Dashboard() {
                                                     : "N/A"}
                                             </TableCell>
                                         ))}
-                                        <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
-                                            {item.pourcentage_global.toFixed(2)}%
-                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
