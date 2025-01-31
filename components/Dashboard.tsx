@@ -87,7 +87,7 @@ export default function Dashboard() {
                             <TableBody>
                                 {data.map((item, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{item.delegation_name}</TableCell>
+                                        <TableCell className="font-bold">{item.delegation_name}</TableCell>
                                         <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
                                             {item.pourcentage_global.toFixed(2)}%
                                         </TableCell>{productNames.map((product) => (
