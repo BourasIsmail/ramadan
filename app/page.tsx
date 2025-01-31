@@ -6,7 +6,7 @@ export default function Home() {
             <img src="/img.png" alt="Logo" className="h-12 w-30 " />
             <div className="flex items-center justify-center mb-4">
                 <h1 className="text-3xl font-bold text-center">
-                    Opération Ramadan
+                    Opération Ramadan 2025
                 </h1>
             </div>
             <Dashboard />
