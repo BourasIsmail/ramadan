@@ -74,27 +74,31 @@ export default function Dashboard() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Delegation</TableHead>
-                                    <TableHead>pourcentages totaux</TableHead>
+                                    <TableHead className="bg-gray-200 font-bold">Delegation</TableHead>
+                                    <TableHead className="bg-gray-200 font-bold">pourcentages totaux</TableHead>
                                     {productNames.map((product) => (
-                                        <TableHead key={product}>{product}</TableHead>
+                                        <TableHead key={product} className="bg-gray-200 font-bold">
+                                            {product}
+                                        </TableHead>
                                     ))}
                                 </TableRow>
                             </TableHeader>
+
                             <TableBody>
                                 {data.map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{item.delegation_name}</TableCell>
                                         <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
                                             {item.pourcentage_global.toFixed(2)}%
+                                        </TableCell>{productNames.map((product) => (
+                                        <TableCell
+                                            key={product}
+                                            className={clsx(item[product] === 100 && "text-green-600", "text-center")}
+                                        >
+                                            {typeof item[product] === "number" ? `${item[product].toFixed(2)}%` : "N/A"}
                                         </TableCell>
-                                        {productNames.map((product) => (
-                                            <TableCell key={product}>
-                                                {typeof item[product] === "number"
-                                                    ? `${item[product].toFixed(2)}%`
-                                                    : "N/A"}
-                                            </TableCell>
-                                        ))}
+                                    ))}
+
                                     </TableRow>
                                 ))}
                             </TableBody>
