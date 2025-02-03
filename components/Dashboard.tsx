@@ -116,7 +116,7 @@ export default function Dashboard() {
                     <CardTitle>Résumé Global</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">Moyenne des pourcentages totaux: {averagePercentage.toFixed(2)}%</div>
+                    <div className="text-2xl text-red-700 font-bold">Pourcentage totale des receptions de toutes les délégations: {averagePercentage.toFixed(2)}%</div>
                 </CardContent>
             </Card>
         </div>
