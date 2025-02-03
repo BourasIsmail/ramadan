@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import clsx from "clsx";
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import clsx from "clsx"
 
 interface DelegationData {
-    delegation_name: string;
-    pourcentage_global: number;
-    [key: string]: string | number; // For dynamic product columns
+    delegation_name: string
+    pourcentage_global: number
+    [key: string]: string | number // For dynamic product columns
 }
 
 const productNames = [
@@ -23,44 +23,49 @@ const productNames = [
     "Pate",
     "Lait",
     "Riz",
-];
+]
 
 export default function Dashboard() {
-    const [data, setData] = useState<DelegationData[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState<DelegationData[]>([])
+    const [loading, setLoading] = useState(true)
+    const [averagePercentage, setAveragePercentage] = useState(0)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("/api");
+                const response = await fetch("/api")
                 if (!response.ok) {
-                    throw new Error("Failed to fetch data");
+                    throw new Error("Failed to fetch data")
                 }
-                const result = await response.json();
-                setData(result);
+                const result = await response.json()
+                setData(result)
+
+                // Calculate average percentage
+                const totalPercentage = result.reduce((sum: number, item: DelegationData) => sum + item.pourcentage_global, 0)
+                setAveragePercentage(totalPercentage / result.length)
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error fetching data:", error)
             } finally {
-                setLoading(false);
+                setLoading(false)
             }
-        };
+        }
 
-        fetchData();
-    }, []);
+        fetchData()
+    }, [])
 
-    // Fonction pour appliquer les classes de couleur en fonction de la valeur du pourcentage
+    // Function to apply color classes based on percentage value
     const getPercentageClass = (percentage: number) => {
         if (percentage === 0) {
-            return "text-red-600"; // Rouge
+            return "text-red-600" // Red
         } else if (percentage === 100) {
-            return "text-green-600"; // Vert
+            return "text-green-600" // Green
         } else {
-            return "text-blue-500"; // bleu
+            return "text-blue-500" // Blue
         }
-    };
+    }
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>Loading...</div>
     }
 
     return (
@@ -90,15 +95,15 @@ export default function Dashboard() {
                                         <TableCell className="font-bold text-purple-900">{item.delegation_name}</TableCell>
                                         <TableCell className={clsx(getPercentageClass(item.pourcentage_global))}>
                                             {item.pourcentage_global.toFixed(2)}%
-                                        </TableCell>{productNames.map((product) => (
-                                        <TableCell
-                                            key={product}
-                                            className={clsx(item[product] === 100 && "text-green-600", "text-center")}
-                                        >
-                                            {typeof item[product] === "number" ? `${item[product].toFixed(2)}%` : "N/A"}
                                         </TableCell>
-                                    ))}
-
+                                        {productNames.map((product) => (
+                                            <TableCell
+                                                key={product}
+                                                className={clsx(item[product] === 100 && "text-green-600", "text-center")}
+                                            >
+                                                {typeof item[product] === "number" ? `${item[product].toFixed(2)}%` : "N/A"}
+                                            </TableCell>
+                                        ))}
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -106,6 +111,15 @@ export default function Dashboard() {
                     </div>
                 </CardContent>
             </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Résumé Global</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">Moyenne des pourcentages totaux: {averagePercentage.toFixed(2)}%</div>
+                </CardContent>
+            </Card>
         </div>
-    );
+    )
 }
+
