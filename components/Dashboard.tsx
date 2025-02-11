@@ -57,8 +57,10 @@ export default function Dashboard() {
     const getPercentageClass = (percentage: number) => {
         if (percentage === 0) {
             return "text-red-600" // Red
-        } else if (percentage === 100) {
+        } else if (percentage >= 100 && percentage < 101) {
             return "text-green-600" // Green
+        } else if (percentage >= 101) {
+            return "text-orange-500" // Orange
         } else {
             return "text-blue-500" // Blue
         }
@@ -99,7 +101,7 @@ export default function Dashboard() {
                                         {productNames.map((product) => (
                                             <TableCell
                                                 key={product}
-                                                className={clsx(item[product] === 100 && "text-green-600", "text-center")}
+                                                className={clsx(getPercentageClass(Number(item[product])), "text-center")}
                                             >
                                                 {typeof item[product] === "number" ? `${item[product].toFixed(2)}%` : "N/A"}
                                             </TableCell>
@@ -116,7 +118,9 @@ export default function Dashboard() {
                     <CardTitle>Résumé Global</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl text-red-700 font-bold">Pourcentage total des récéptions de toutes les délégations: {averagePercentage.toFixed(2)}%</div>
+                    <div className={clsx("text-2xl font-bold", getPercentageClass(averagePercentage))}>
+                        Pourcentage total des récéptions de toutes les délégations: {averagePercentage.toFixed(2)}%
+                    </div>
                 </CardContent>
             </Card>
         </div>
