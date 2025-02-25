@@ -5,8 +5,8 @@ export async function GET() {
     try {
         const connection = await mysql.createConnection({
             host: "172.16.20.111",
-            user: "admin",
-            password: "EN*qZ5Qwz*SIC",
+            user: "usr_opramadan",
+            password: "EN*8sQ47sWJ*SIC57",
             database: "entraide_opramadan_db",
         })
 
