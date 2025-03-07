@@ -125,7 +125,7 @@ export default function Dashboard() {
             {distributionData.length > 0 && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>Distribution du Produit</CardTitle>
+                        <CardTitle>Distribution des paniers</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="overflow-x-auto">
