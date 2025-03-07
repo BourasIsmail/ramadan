@@ -10,7 +10,8 @@ export async function GET() {
             database: "entraide_opramadan_db",
         })
 
-        const [rows] = await connection.execute(`
+        // Execute the first query (existing)
+        const [productStats] = await connection.execute(`
             SELECT d.libelle                                                                                      AS delegation_name,
                    ROUND((SUM(CASE WHEN p.libelle = 'Sac Recyclable' THEN IFNULL(rd.quantite_totale, 0) END) /
                           NULLIF(SUM(CASE WHEN p.libelle = 'Sac Recyclable' THEN dp.quantite_prevue END), 0)) * 100,
@@ -96,14 +97,37 @@ export async function GET() {
                                ON rd.delegation_id = d.id AND rd.produit_id = dp.produit_id
             GROUP BY d.id, d.libelle
             ORDER BY d.libelle ASC;
-      `)
+        `)
+
+        // Execute the second query (new)
+        const [productDistribution] = await connection.execute(`
+            SELECT 
+                d.libelle as 'Délégation', 
+                COALESCE(dp.quantite_prevue, 0) as "Quantité attribuée", 
+                COALESCE(SUM(di.quantite), 0) as "Quantité distribuée",
+                ROUND(
+                    (COALESCE(SUM(di.quantite), 0) / NULLIF(COALESCE(dp.quantite_prevue, 0), 0)) * 100, 
+                    2
+                ) as "Taux (%)"
+            FROM 
+                delegations d 
+                LEFT JOIN distributions di ON d.id = di.delegation_id 
+                JOIN delegation_produits dp ON dp.delegation_id = d.id 
+            WHERE 
+                dp.produit_id = 2 
+            GROUP BY 
+                d.libelle, dp.quantite_prevue;
+        `)
 
         await connection.end()
 
-        return NextResponse.json(rows)
+        // Return both query results
+        return NextResponse.json({
+            productStats,
+            productDistribution
+        })
     } catch (error) {
         console.error("Error fetching data:", error)
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }
-

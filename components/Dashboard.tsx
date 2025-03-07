@@ -11,6 +11,13 @@ interface DelegationData {
     [key: string]: string | number // For dynamic product columns
 }
 
+interface ProductDistribution {
+    "Délégation": string
+    "Quantité attribuée": number
+    "Quantité distribuée": number
+    "Taux (%)": number
+}
+
 const productNames = [
     "Sac Recyclable",
     "Carte",
@@ -27,8 +34,10 @@ const productNames = [
 
 export default function Dashboard() {
     const [data, setData] = useState<DelegationData[]>([])
+    const [distributionData, setDistributionData] = useState<ProductDistribution[]>([])
     const [loading, setLoading] = useState(true)
     const [averagePercentage, setAveragePercentage] = useState(0)
+    const [totalDistributionPercentage, setTotalDistributionPercentage] = useState(0)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,11 +47,26 @@ export default function Dashboard() {
                     throw new Error("Failed to fetch data")
                 }
                 const result = await response.json()
-                setData(result)
+
+                // Handle the new API response structure
+                setData(result.productStats || result)
+                setDistributionData(result.productDistribution || [])
 
                 // Calculate average percentage
-                const totalPercentage = result.reduce((sum: number, item: DelegationData) => sum + item.pourcentage_global, 0)
-                setAveragePercentage(totalPercentage / result.length)
+                const statsData = result.productStats || result
+                const totalPercentage = statsData.reduce(
+                    (sum: number, item: DelegationData) => sum + item.pourcentage_global,
+                    0
+                )
+                setAveragePercentage(totalPercentage / statsData.length)
+
+                // Calculate total distribution percentage
+                const distributionStats = result.productDistribution || []
+                const totalDistributionRate = distributionStats.reduce(
+                    (sum: number, item: ProductDistribution) => sum + item["Taux (%)"],
+                    0
+                )
+                setTotalDistributionPercentage(totalDistributionRate / 82)
             } catch (error) {
                 console.error("Error fetching data:", error)
             } finally {
@@ -72,6 +96,46 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-4">
+            {/* New Table for Product Distribution */}
+            {distributionData.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Distribution du Produit</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="bg-gray-200 font-bold">Délégation</TableHead>
+                                        <TableHead className="bg-gray-200 font-bold">Quantité attribuée</TableHead>
+                                        <TableHead className="bg-gray-200 font-bold">Quantité distribuée</TableHead>
+                                        <TableHead className="bg-gray-200 font-bold">Taux (%)</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+
+                                <TableBody>
+                                    {distributionData.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-bold text-purple-900">{item["Délégation"]}</TableCell>
+                                            <TableCell>{item["Quantité attribuée"]}</TableCell>
+                                            <TableCell>{item["Quantité distribuée"]}</TableCell>
+                                            <TableCell className={clsx(getPercentageClass(item["Taux (%)"]))}>
+                                                {item["Taux (%)"].toFixed(2)}%
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                        <div className="mt-4">
+                            <div className={clsx("text-xl font-bold", getPercentageClass(totalDistributionPercentage))}>
+                                Pourcentage total des distributions: {totalDistributionPercentage.toFixed(2)}%
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
             <Card>
                 <CardHeader>
                     <CardTitle>Détails :</CardTitle>
@@ -113,6 +177,8 @@ export default function Dashboard() {
                     </div>
                 </CardContent>
             </Card>
+
+
             <Card>
                 <CardHeader>
                     <CardTitle>Résumé Global</CardTitle>
@@ -126,4 +192,3 @@ export default function Dashboard() {
         </div>
     )
 }
-
