@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ArrowDown, ArrowUp } from "lucide-react"
 import clsx from "clsx"
 
 interface DelegationData {
@@ -12,11 +13,13 @@ interface DelegationData {
 }
 
 interface ProductDistribution {
-    "Délégation": string
+    Délégation: string
     "Quantité attribuée": number
     "Quantité distribuée": number
     "Taux (%)": number
 }
+
+type SortDirection = "asc" | "desc" | null
 
 const productNames = [
     "Sac Recyclable",
@@ -38,6 +41,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [averagePercentage, setAveragePercentage] = useState(0)
     const [totalDistributionPercentage, setTotalDistributionPercentage] = useState(0)
+    const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
 
     useEffect(() => {
         const fetchData = async () => {
@@ -50,21 +54,26 @@ export default function Dashboard() {
 
                 // Handle the new API response structure
                 setData(result.productStats || result)
-                setDistributionData(result.productDistribution || [])
+
+                // Sort the distribution data initially
+                const distributionStats = result.productDistribution || []
+                const sortedDistributionData = [...distributionStats].sort((a, b) => {
+                    return b["Taux (%)"] - a["Taux (%)"] // Initial descending sort
+                })
+                setDistributionData(sortedDistributionData)
 
                 // Calculate average percentage
                 const statsData = result.productStats || result
                 const totalPercentage = statsData.reduce(
                     (sum: number, item: DelegationData) => sum + item.pourcentage_global,
-                    0
+                    0,
                 )
                 setAveragePercentage(totalPercentage / statsData.length)
 
                 // Calculate total distribution percentage
-                const distributionStats = result.productDistribution || []
                 const totalDistributionRate = distributionStats.reduce(
                     (sum: number, item: ProductDistribution) => sum + item["Taux (%)"],
-                    0
+                    0,
                 )
                 setTotalDistributionPercentage(totalDistributionRate / distributionStats.length)
             } catch (error) {
@@ -90,6 +99,22 @@ export default function Dashboard() {
         }
     }
 
+    // Function to sort distribution data by rate
+    const sortDistributionData = () => {
+        const newSortDirection = sortDirection === "asc" ? "desc" : "asc"
+        setSortDirection(newSortDirection)
+
+        const sortedData = [...distributionData].sort((a, b) => {
+            if (newSortDirection === "asc") {
+                return a["Taux (%)"] - b["Taux (%)"]
+            } else {
+                return b["Taux (%)"] - a["Taux (%)"]
+            }
+        })
+
+        setDistributionData(sortedData)
+    }
+
     if (loading) {
         return <div>Loading...</div>
     }
@@ -108,9 +133,18 @@ export default function Dashboard() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="bg-gray-200 font-bold">Délégation</TableHead>
-                                        <TableHead className="bg-gray-200 font-bold">Quantité attribuée</TableHead>
-                                        <TableHead className="bg-gray-200 font-bold">Quantité distribuée</TableHead>
-                                        <TableHead className="bg-gray-200 font-bold">Taux (%)</TableHead>
+                                        {/*<TableHead className="bg-gray-200 font-bold">Quantité attribuée</TableHead>
+                                        <TableHead className="bg-gray-200 font-bold">Quantité distribuée</TableHead>*/}
+                                        <TableHead
+                                            className="bg-gray-200 font-bold cursor-pointer select-none"
+                                            onClick={sortDistributionData}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                Taux (%)
+                                                {sortDirection === "asc" && <ArrowUp className="h-4 w-4" />}
+                                                {sortDirection === "desc" && <ArrowDown className="h-4 w-4" />}
+                                            </div>
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
 
@@ -118,8 +152,8 @@ export default function Dashboard() {
                                     {distributionData.map((item, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-bold text-purple-900">{item["Délégation"]}</TableCell>
-                                            <TableCell><b>{item["Quantité attribuée"]}</b></TableCell>
-                                            <TableCell><b>{item["Quantité distribuée"]}</b></TableCell>
+                                            {/*<TableCell><b>{item["Quantité attribuée"]}</b></TableCell>
+                                            <TableCell><b>{item["Quantité distribuée"]}</b></TableCell>*/}
                                             <TableCell className={clsx(getPercentageClass(item["Taux (%)"]))}>
                                                 {item["Taux (%)"].toFixed(2)}%
                                             </TableCell>
@@ -178,7 +212,6 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-
             <Card>
                 <CardHeader>
                     <CardTitle>Résumé Global</CardTitle>
@@ -192,3 +225,4 @@ export default function Dashboard() {
         </div>
     )
 }
+
