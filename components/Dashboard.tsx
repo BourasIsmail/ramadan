@@ -66,7 +66,7 @@ export default function Dashboard() {
                     (sum: number, item: ProductDistribution) => sum + item["Taux (%)"],
                     0
                 )
-                setTotalDistributionPercentage(totalDistributionRate / 82)
+                setTotalDistributionPercentage(totalDistributionRate / distributionStats.length)
             } catch (error) {
                 console.error("Error fetching data:", error)
             } finally {
@@ -118,8 +118,8 @@ export default function Dashboard() {
                                     {distributionData.map((item, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-bold text-purple-900">{item["Délégation"]}</TableCell>
-                                            <TableCell>{item["Quantité attribuée"]}</TableCell>
-                                            <TableCell>{item["Quantité distribuée"]}</TableCell>
+                                            <TableCell><b>{item["Quantité attribuée"]}</b></TableCell>
+                                            <TableCell><b>{item["Quantité distribuée"]}</b></TableCell>
                                             <TableCell className={clsx(getPercentageClass(item["Taux (%)"]))}>
                                                 {item["Taux (%)"].toFixed(2)}%
                                             </TableCell>
