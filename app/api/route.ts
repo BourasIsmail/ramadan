@@ -101,22 +101,21 @@ export async function GET() {
 
         // Execute the second query (new)
         const [productDistribution] = await connection.execute(`
-            SELECT 
-                d.libelle as 'Délégation', 
-                COALESCE(dp.quantite_prevue, 0) as "Quantité attribuée", 
-                COALESCE(SUM(di.quantite), 0) as "Quantité distribuée",
-                ROUND(
-                    (COALESCE(SUM(di.quantite), 0) / NULLIF(COALESCE(dp.quantite_prevue, 0), 0)) * 100, 
+            SELECT d.libelle as 'Délégation', COALESCE(dp.quantite_prevue, 0) as 'Quantité attribuée', COALESCE(SUM(di.quantite), 0) as 'Quantité distribuée', ROUND(
+                (COALESCE(SUM(di.quantite), 0) / NULLIF(COALESCE(dp.quantite_prevue, 0), 0)) * 100,
                     2
-                ) as "Taux (%)"
-            FROM 
-                delegations d 
-                LEFT JOIN distributions di ON d.id = di.delegation_id 
-                JOIN delegation_produits dp ON dp.delegation_id = d.id 
-            WHERE 
-                dp.produit_id = 2 
-            GROUP BY 
-                d.libelle, dp.quantite_prevue;
+                ) as 'Taux (%)'
+            FROM delegations d
+                     LEFT JOIN
+                 distributions di ON d.id = di.delegation_id
+                     JOIN
+                 delegation_produits dp ON dp.delegation_id = d.id
+            WHERE dp.produit_id = 2
+              AND di.deleted_by IS NULL
+              AND di.deleted_at IS NULL
+              AND dp.deleted_at IS NULL
+            GROUP BY d.libelle, dp.quantite_prevue
+            ORDER BY \`Taux (%)\` DESC;
         `)
 
         await connection.end()
