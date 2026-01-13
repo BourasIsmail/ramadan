@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import mysql from "mysql2/promise";
 
 interface ProductStatsRow {
-  delegation_name: string;
+  direction_provinciale_name: string;
   produit_name: string;
   quantite_prevue: number;
   quantite_totale: number;
@@ -11,7 +11,7 @@ interface ProductStatsRow {
 }
 
 interface DelegationData {
-  delegation_name: string;
+  direction_provinciale_name: string;
   pourcentage_global: number;
   [key: string]: string | number;
 }
@@ -25,10 +25,9 @@ export async function GET() {
       database: "entraide_opramadan_db",
     });
 
-    // Query to get detailed product stats
     const [results] = await connection.execute(`
             SELECT
-                d.libelle AS delegation_name,
+                d.libelle AS direction_provinciale_name,
                 p.libelle AS produit_name,
                 dp.quantite_prevue,
                 COALESCE(SUM(rd.quantite), 0) AS quantite_totale,
@@ -96,7 +95,7 @@ export async function GET() {
 
     const [distributionResults] = await connection.execute(`
             SELECT
-                d.libelle AS 'Délégation',
+                d.libelle AS 'Direction Provinciale',
                 SUM(dp.quantite_prevue) AS 'Quantité attribuée',
                 COALESCE(SUM(rd.quantite), 0) AS 'Quantité distribuée',
                 ROUND(
@@ -127,13 +126,13 @@ export async function GET() {
 
     const productStats = Array.from(
       (results as ProductStatsRow[]).reduce((map, row) => {
-        if (!map.has(row.delegation_name)) {
-          map.set(row.delegation_name, {
-            delegation_name: row.delegation_name,
+        if (!map.has(row.direction_provinciale_name)) {
+          map.set(row.direction_provinciale_name, {
+            direction_provinciale_name: row.direction_provinciale_name,
             pourcentage_global: row.pourcentage_global || 0,
           });
         }
-        const delegation = map.get(row.delegation_name)!;
+        const delegation = map.get(row.direction_provinciale_name)!;
         delegation[row.produit_name] = row.pourcentage || 0;
         return map;
       }, new Map<string, DelegationData>())

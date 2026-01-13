@@ -14,13 +14,13 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import clsx from "clsx";
 
 interface DelegationData {
-  delegation_name: string;
+  direction_provinciale_name: string;
   pourcentage_global: number;
   [key: string]: string | number; // For dynamic product columns
 }
 
 interface ProductDistribution {
-  Délégation: string;
+  "Direction Provinciale": string;
   "Quantité attribuée": number;
   "Quantité distribuée": number;
   "Taux (%)": number;
@@ -145,7 +145,7 @@ export default function Dashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="bg-gray-200 font-bold">
-                      Délégation
+                      Direction Provinciale
                     </TableHead>
                     <TableHead
                       className="bg-gray-200 font-bold cursor-pointer select-none"
@@ -168,7 +168,7 @@ export default function Dashboard() {
                   {distributionData.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-bold text-purple-900">
-                        {item["Délégation"]}
+                        {item["Direction Provinciale"]}
                       </TableCell>
                       <TableCell
                         className={clsx(getPercentageClass(item["Taux (%)"]))}
@@ -204,7 +204,7 @@ export default function Dashboard() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="bg-gray-200 font-bold">
-                    Delegation
+                    Direction Provinciale
                   </TableHead>
                   <TableHead className="bg-gray-200 font-bold">
                     pourcentages totaux
@@ -221,7 +221,7 @@ export default function Dashboard() {
                 {data.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-bold text-purple-900">
-                      {item.delegation_name}
+                      {item.direction_provinciale_name}
                     </TableCell>
                     <TableCell
                       className={clsx(
@@ -262,8 +262,8 @@ export default function Dashboard() {
               getPercentageClass(averagePercentage)
             )}
           >
-            Pourcentage total des récéptions de toutes les délégations:{" "}
-            {averagePercentage.toFixed(2)}%
+            Pourcentage total des récéptions de toutes les directions
+            provinciales: {averagePercentage.toFixed(2)}%
           </div>
         </CardContent>
       </Card>
