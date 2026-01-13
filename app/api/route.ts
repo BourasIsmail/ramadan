@@ -1,6 +1,28 @@
 import { NextResponse } from "next/server";
 import mysql from "mysql2/promise";
 
+interface ProductStatsRow {
+  delegation_name: string;
+  produit_name: string;
+  quantite_prevue: number;
+  quantite_totale: number;
+  pourcentage: number;
+  pourcentage_global: number;
+}
+
+interface DistributionRow {
+  Délégation: string;
+  "Quantité attribuée": number;
+  "Quantité distribuée": number;
+  "Taux (%)": number;
+}
+
+interface DelegationData {
+  delegation_name: string;
+  pourcentage_global: number;
+  [key: string]: string | number;
+}
+
 export async function GET() {
   try {
     const connection = await mysql.createConnection({
@@ -111,18 +133,18 @@ export async function GET() {
     await connection.end();
 
     const productStats = Array.from(
-      (results as any[]).reduce((map, row) => {
+      (results as ProductStatsRow[]).reduce((map, row) => {
         if (!map.has(row.delegation_name)) {
           map.set(row.delegation_name, {
             delegation_name: row.delegation_name,
             pourcentage_global: row.pourcentage_global || 0,
           });
         }
-        const delegation = map.get(row.delegation_name);
+        const delegation = map.get(row.delegation_name)!;
         delegation[row.produit_name] = row.pourcentage || 0;
         return map;
-      }, new Map())
-    ).map(([_, data]) => data);
+      }, new Map<string, DelegationData>())
+    ).map(([, data]) => data);
 
     return NextResponse.json({
       productStats,
