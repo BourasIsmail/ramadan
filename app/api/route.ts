@@ -10,13 +10,6 @@ interface ProductStatsRow {
   pourcentage_global: number;
 }
 
-interface DistributionRow {
-  Délégation: string;
-  "Quantité attribuée": number;
-  "Quantité distribuée": number;
-  "Taux (%)": number;
-}
-
 interface DelegationData {
   delegation_name: string;
   pourcentage_global: number;
