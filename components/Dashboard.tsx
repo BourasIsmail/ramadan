@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -25,6 +19,20 @@ interface DataRow {
   pourcentage: number;
   pourcentage_global: number;
 }
+
+const PRODUCT_COLUMNS = [
+  "Sac Recyclable",
+  "Carte",
+  "Sucre",
+  "Thé",
+  "Farine",
+  "Huile",
+  "Tomate",
+  "Lentille",
+  "Pate",
+  "Lait",
+  "Riz",
+];
 
 export default function Dashboard() {
   const [data, setData] = useState<DataRow[]>([]);
@@ -50,6 +58,32 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const pivotData = () => {
+    const delegationMap = new Map<
+      string,
+      { products: Record<string, number>; pourcentage_global: number }
+    >();
+
+    data.forEach((row) => {
+      if (!delegationMap.has(row.delegation_name)) {
+        delegationMap.set(row.delegation_name, {
+          products: {},
+          pourcentage_global: row.pourcentage_global || 0,
+        });
+      }
+      const delegation = delegationMap.get(row.delegation_name)!;
+      delegation.products[row.produit_name] = row.pourcentage || 0;
+    });
+
+    // Sort delegations alphabetically
+    return Array.from(delegationMap.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, data]) => ({
+        delegation_name: name,
+        ...data,
+      }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -61,74 +95,54 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="flex items-center justify-center p-8">
-        <p className="text-lg text-red-600">Erreur: {error}</p>
+        <p className="text-lg text-destructive">Erreur: {error}</p>
       </div>
     );
   }
 
-  // Group data by delegation
-  const groupedData = data.reduce((acc, row) => {
-    if (!acc[row.delegation_name]) {
-      acc[row.delegation_name] = {
-        pourcentage_global: row.pourcentage_global,
-        produits: [],
-      };
-    }
-    acc[row.delegation_name].produits.push(row);
-    return acc;
-  }, {} as Record<string, { pourcentage_global: number; produits: DataRow[] }>);
+  const tableData = pivotData();
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedData).map(([delegationName, delegationData]) => (
-        <Card key={delegationName}>
-          <CardHeader>
-            <CardTitle>{delegationName}</CardTitle>
-            <CardDescription>
-              Pourcentage global:{" "}
-              {delegationData.pourcentage_global?.toFixed(2) || 0}%
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Produit</TableHead>
-                  <TableHead className="text-right">Quantité prévue</TableHead>
-                  <TableHead className="text-right">Quantité reçue</TableHead>
-                  <TableHead className="text-right">Pourcentage</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {delegationData.produits.map((row, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell className="font-medium">
-                      {row.produit_name}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {row.quantite_prevue}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {row.quantite_totale}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <span
-                        className={
-                          row.pourcentage >= 100
-                            ? "text-green-600 font-semibold"
-                            : ""
-                        }
-                      >
-                        {row.pourcentage?.toFixed(2) || 0}%
-                      </span>
-                    </TableCell>
-                  </TableRow>
+      <Card>
+        <CardHeader>
+          <CardTitle>Details</CardTitle>
+        </CardHeader>
+        <CardContent className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[140px]">Delegation</TableHead>
+                {PRODUCT_COLUMNS.map((product) => (
+                  <TableHead key={product} className="text-center min-w-[90px]">
+                    {product}
+                  </TableHead>
                 ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      ))}
+                <TableHead className="text-center min-w-[140px]">
+                  Percentages Totals
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableData.map((row) => (
+                <TableRow key={row.delegation_name}>
+                  <TableCell className="font-medium">
+                    {row.delegation_name}
+                  </TableCell>
+                  {PRODUCT_COLUMNS.map((product) => (
+                    <TableCell key={product} className="text-center">
+                      {(row.products[product] ?? 0).toFixed(2)}%
+                    </TableCell>
+                  ))}
+                  <TableCell className="text-center font-medium">
+                    {row.pourcentage_global.toFixed(2)}%
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
