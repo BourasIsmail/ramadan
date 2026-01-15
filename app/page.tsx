@@ -1,15 +1,29 @@
 import Dashboard from "@/components/Dashboard";
+import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="container mx-auto p-4">
-      <img src="/img.png" alt="Logo" className="h-12 w-30 " />
-      <div className="flex items-center justify-center mb-4">
-        <h1 className="text-3xl text-purple-900 font-bold text-center">
-          Opération Ramadan 2026
-        </h1>
+    <main className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-8 max-w-[1600px]">
+        {/* Header */}
+        <div className="mb-8 flex items-center gap-4 pb-6 border-b">
+          <Image
+            src="/img.png"
+            alt="Logo"
+            width={120}
+            height={48}
+            className="h-12 w-auto"
+          />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">
+              Opération Ramadan 1447
+            </h1>
+            <p className="text-muted-foreground">Tableau de bord</p>
+          </div>
+        </div>
+
+        <Dashboard />
       </div>
-      <Dashboard />
     </main>
   );
 }
