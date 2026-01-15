@@ -49,6 +49,7 @@ export default function Dashboard() {
     ProductDistribution[]
   >([]);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [averagePercentage, setAveragePercentage] = useState(0);
   const [totalDistributionPercentage, setTotalDistributionPercentage] =
     useState(0);
@@ -113,7 +114,7 @@ export default function Dashboard() {
   };
 
   // Function to apply background color classes based on percentage value
-  const getPercentageBgClass = (percentage: number) => {
+  /*const getPercentageBgClass = (percentage: number) => {
     if (percentage === 0) {
       return "bg-red-50 dark:bg-red-950/20";
     } else if (percentage >= 100 && percentage < 101) {
@@ -123,7 +124,7 @@ export default function Dashboard() {
     } else {
       return "bg-blue-50 dark:bg-blue-950/20";
     }
-  };
+  };*/
 
   // Function to sort distribution data by rate
   const sortDistributionData = () => {
@@ -141,12 +142,12 @@ export default function Dashboard() {
     setDistributionData(sortedData);
   };
 
-  const chartData = distributionData.slice(0, 10).map((item) => ({
+  /*const chartData = distributionData.slice(0, 10).map((item) => ({
     name: item["Direction Provinciale"],
     taux: item["Taux (%)"],
-  }));
+  }));*/
 
-  const productChartData = productNames.map((product) => {
+  /*const productChartData = productNames.map((product) => {
     const total = data.reduce(
       (sum, item) => sum + (Number(item[product]) || 0),
       0
@@ -156,7 +157,7 @@ export default function Dashboard() {
       product,
       average: Number(average.toFixed(2)),
     };
-  });
+  });*/
 
   if (loading) {
     return (
