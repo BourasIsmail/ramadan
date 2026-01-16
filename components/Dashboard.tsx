@@ -395,7 +395,7 @@ export default function Dashboard() {
             </Table>
             <div className="mt-4 p-4 bg-muted rounded-lg flex justify-between items-center">
               <span className="font-medium">
-                Pourcentage total des distributions
+                Pourcentage total des receptions
               </span>
               <span
                 className={
