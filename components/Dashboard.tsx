@@ -10,6 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ArrowDown, ArrowUp } from "lucide-react";
 // import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 // import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -51,6 +53,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [averagePercentage, setAveragePercentage] = useState(0);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalDistributionPercentage, setTotalDistributionPercentage] =
     useState(0);
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -127,6 +131,7 @@ export default function Dashboard() {
   };*/
 
   // Function to sort distribution data by rate
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sortDistributionData = () => {
     const newSortDirection = sortDirection === "asc" ? "desc" : "asc";
     setSortDirection(newSortDirection);
@@ -349,7 +354,7 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
-
+      {/*
       {distributionData.length > 0 && (
         <Card>
           <CardHeader>
@@ -409,6 +414,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       )}
+        */}
       {/*
       <Card>
         <CardHeader>
