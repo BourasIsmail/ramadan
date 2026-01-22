@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,9 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ArrowDown, ArrowUp } from "lucide-react";
 // import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 // import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
@@ -20,6 +18,10 @@ interface DelegationData {
   direction_provinciale_name: string;
   pourcentage_global: number;
   [key: string]: string | number; // For dynamic product columns
+}
+
+interface ProductGlobalAverages {
+  [key: string]: number;
 }
 
 interface ProductDistribution {
@@ -51,13 +53,13 @@ export default function Dashboard() {
     ProductDistribution[]
   >([]);
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [averagePercentage, setAveragePercentage] = useState(0);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalDistributionPercentage, setTotalDistributionPercentage] =
     useState(0);
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [productGlobalAverages, setProductGlobalAverages] =
+    useState<ProductGlobalAverages>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,6 +72,7 @@ export default function Dashboard() {
 
         // Handle the new API response structure
         setData(result.productStats || result);
+        setProductGlobalAverages(result.productGlobalAverages || {});
 
         // Sort the distribution data initially
         const distributionStats = result.productDistribution || [];
@@ -118,7 +121,8 @@ export default function Dashboard() {
   };
 
   // Function to apply background color classes based on percentage value
-  /*const getPercentageBgClass = (percentage: number) => {
+  //ESlint-disable-next-line @typescript-eslint/no-unused-vars
+  const getPercentageBgClass = (percentage: number) => {
     if (percentage === 0) {
       return "bg-red-50 dark:bg-red-950/20";
     } else if (percentage >= 100 && percentage < 101) {
@@ -128,10 +132,9 @@ export default function Dashboard() {
     } else {
       return "bg-blue-50 dark:bg-blue-950/20";
     }
-  };*/
+  };
 
   // Function to sort distribution data by rate
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sortDistributionData = () => {
     const newSortDirection = sortDirection === "asc" ? "desc" : "asc";
     setSortDirection(newSortDirection);
@@ -146,13 +149,13 @@ export default function Dashboard() {
 
     setDistributionData(sortedData);
   };
-
-  /*const chartData = distributionData.slice(0, 10).map((item) => ({
+  //ESlint-disable-next-line @typescript-eslint/no-unused-vars
+  const chartData = distributionData.slice(0, 10).map((item) => ({
     name: item["Direction Provinciale"],
     taux: item["Taux (%)"],
-  }));*/
-
-  /*const productChartData = productNames.map((product) => {
+  }));
+  //ESlint-disable-next-line @typescript-eslint/no-unused-vars
+  const productChartData = productNames.map((product) => {
     const total = data.reduce(
       (sum, item) => sum + (Number(item[product]) || 0),
       0
@@ -162,7 +165,7 @@ export default function Dashboard() {
       product,
       average: Number(average.toFixed(2)),
     };
-  });*/
+  });
 
   if (loading) {
     return (
@@ -181,7 +184,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/*
+      {/*}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
@@ -222,7 +225,8 @@ export default function Dashboard() {
             <div className="text-3xl font-bold">{data.length}</div>
           </CardContent>
         </Card>
-      </div>*/}
+      </div>
+      /*}
 
       {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
@@ -349,16 +353,44 @@ export default function Dashboard() {
                     ))}
                   </TableRow>
                 ))}
+                {/* Footer row with global product averages */}
+                <TableRow className="bg-muted/50 font-bold border-t-2">
+                  <TableCell className="font-bold sticky left-0 bg-muted/50">
+                    Moyenne Globale
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span
+                      className={
+                        getPercentageClass(averagePercentage) + " font-bold"
+                      }
+                    >
+                      {averagePercentage.toFixed(2)}%
+                    </span>
+                  </TableCell>
+                  {productNames.map((product) => (
+                    <TableCell key={product} className="text-center">
+                      <span
+                        className={
+                          getPercentageClass(
+                            productGlobalAverages[product] || 0
+                          ) + " font-bold"
+                        }
+                      >
+                        {productGlobalAverages[product]?.toFixed(2) || "0.00"}%
+                      </span>
+                    </TableCell>
+                  ))}
+                </TableRow>
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
-      {/*
+      {/*}
       {distributionData.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Pourcentage de Reception Global par Province</CardTitle>
+            <CardTitle>Distribution des paniers</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -400,7 +432,7 @@ export default function Dashboard() {
             </Table>
             <div className="mt-4 p-4 bg-muted rounded-lg flex justify-between items-center">
               <span className="font-medium">
-                Pourcentage total des receptions
+                Pourcentage total des distributions
               </span>
               <span
                 className={
@@ -414,8 +446,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       )}
-        */}
-      {/*
+
       <Card>
         <CardHeader>
           <CardTitle>Résumé Global</CardTitle>

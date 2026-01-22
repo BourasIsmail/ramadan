@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
 import mysql from "mysql2/promise";
 
@@ -8,6 +9,13 @@ interface ProductStatsRow {
   quantite_totale: number;
   pourcentage: number;
   pourcentage_global: number;
+}
+
+interface DistributionRow {
+  "Direction Provinciale": string;
+  "Quantité attribuée": number;
+  "Quantité distribuée": number;
+  "Taux (%)": number;
 }
 
 interface DelegationData {
@@ -138,9 +146,30 @@ export async function GET() {
       }, new Map<string, DelegationData>())
     ).map(([, data]) => data);
 
+    // Calculate global average for each product
+    const productGlobalAverages: Record<string, number> = {};
+    const productCounts: Record<string, number> = {};
+
+    for (const row of results as ProductStatsRow[]) {
+      if (!productGlobalAverages[row.produit_name]) {
+        productGlobalAverages[row.produit_name] = 0;
+        productCounts[row.produit_name] = 0;
+      }
+      productGlobalAverages[row.produit_name] += row.pourcentage || 0;
+      productCounts[row.produit_name] += 1;
+    }
+
+    // Calculate averages
+    for (const product of Object.keys(productGlobalAverages)) {
+      productGlobalAverages[product] = Number(
+        (productGlobalAverages[product] / productCounts[product]).toFixed(2)
+      );
+    }
+
     return NextResponse.json({
       productStats,
       productDistribution: distributionResults,
+      productGlobalAverages,
     });
   } catch (error) {
     console.error("Error fetching data:", error);
